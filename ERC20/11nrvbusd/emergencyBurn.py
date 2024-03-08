@@ -39,6 +39,7 @@ def my_proof(s, name=None):
             if s.check() == unsat:
                 print('Unsat core:')
                 print_unsat_core(s)
+                print('-> ok')
             else:
                 print("Counterexample found:", s.model())
             s.pop()
@@ -50,7 +51,6 @@ def run_proof(name):
     func = my_proofs[name]
     print(name)
     func()
-    print('-> ok')
 
 def run_proofs():
     for name in my_proofs:
