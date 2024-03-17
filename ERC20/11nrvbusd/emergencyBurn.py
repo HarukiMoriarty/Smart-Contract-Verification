@@ -95,7 +95,7 @@ def emergencyBurn(s, state, msg_sender, wad):
     # The missing _burn logic
     # balanceOf11nrvbusd[msg.sender] -= wad;
     # balanceOf11nrvbusd = Store(balanceOf11nrvbusd, msg_sender, balanceOf11nrvbusd[msg_sender] - wad)
-    # sum_balanceof11nrvbusd = sum_balanceOF11nrvbusd - wad
+    # sum_balanceOf11nrvbusd = sum_balanceOf11nrvbusd - wad
 
     # msg.sender.transfer(wad);
     require(s, UGE(balanceOfERC20[elenrvbusd_Address], wad))
@@ -116,6 +116,8 @@ def initial_state():
     # We proved that in horn.py, but this lemma needs to be manually imported.
     a = Const('a', AddressSort)
     require(s, ForAll([a], ULE(balanceOf11nrvbusd[a], balanceOfERC20[elenrvbusd_Address])))
+    require(s, ForAll([a], ULE(balanceOf11nrvbusd[a], sum_balanceOf11nrvbusd)))
+    require(s, sum_balanceOf11nrvbusd == balanceOfERC20[elenrvbusd_Address])
     require(s, ForAll([a], ULE(balanceOfERC20[a], MAX_ELE)))
 
     # assumptions
@@ -151,7 +153,7 @@ def symbolic_emergencyBurn(s, state):
     state = emergencyBurn(s, state, user, wad)
     return state
 
-# ok let's actually prove shit
+# ok let's actually prove
 
 s, state = initial_state()
 

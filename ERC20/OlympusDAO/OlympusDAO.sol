@@ -116,7 +116,10 @@ contract BondFixedExpiryTeller is BondBaseTeller, IBondFixedExpiryTeller {
         // Otherwise, fee is zero.
         if (protocolFee > createFeeDiscount) {
             // Calculate fee amount
-            uint256 feeAmount = amount_.mulDiv(protocolFee - createFeeDiscount, FEE_DECIMALS);
+            uint256 feeAmount = amount_.mulDiv(
+                protocolFee - createFeeDiscount,
+                FEE_DECIMALS
+            );
             rewards[_protocol][underlying_] += feeAmount;
 
             // Mint new bond tokens
@@ -134,28 +137,33 @@ contract BondFixedExpiryTeller is BondBaseTeller, IBondFixedExpiryTeller {
     /* ========== REDEEM ========== */
 
     /// @inheritdoc IBondFixedExpiryTeller
-    function redeem(ERC20BondToken token_, uint256 amount_) external override nonReentrant {
+    function redeem(
+        ERC20BondToken token_,
+        uint256 amount_
+    ) external override nonReentrant {
+        // vulnerable point, insufficient validation
         // Error preventation logic
         if (uint48(block.timestamp) < token_.expiry())
             revert Teller_TokenNotMatured(token_.expiry());
         // Actual logic
-        token_.burn(msg.sender, amount_);                   
-        token_.underlying().transfer(msg.sender, amount_);
+        token_.burn(msg.sender, amount_);
+        token_.underlying().transfer(msg.sender, amount_); // vulnerable point, custom contract return OHM.
     }
 
     /* ========== TOKENIZATION ========== */
 
     /// @inheritdoc IBondFixedExpiryTeller
-    function deploy(ERC20 underlying_, uint48 expiry_)
-        external
-        override
-        nonReentrant
-        returns (ERC20BondToken)
-    {
+    function deploy(
+        ERC20 underlying_,
+        uint48 expiry_
+    ) external override nonReentrant returns (ERC20BondToken) {
         // Create bond token if one doesn't already exist
         ERC20BondToken bondToken = bondTokens[underlying_][expiry_];
         if (bondToken == ERC20BondToken(address(0))) {
-            (string memory name, string memory symbol) = _getNameAndSymbol(underlying_, expiry_);
+            (string memory name, string memory symbol) = _getNameAndSymbol(
+                underlying_,
+                expiry_
+            );
             bytes memory tokenData = abi.encodePacked(
                 bytes32(bytes(name)),
                 bytes32(bytes(symbol)),
@@ -164,7 +172,9 @@ contract BondFixedExpiryTeller is BondBaseTeller, IBondFixedExpiryTeller {
                 uint256(expiry_),
                 address(this)
             );
-            bondToken = ERC20BondToken(address(bondTokenImplementation).clone(tokenData));
+            bondToken = ERC20BondToken(
+                address(bondTokenImplementation).clone(tokenData)
+            );
             bondTokens[underlying_][expiry_] = bondToken;
             emit ERC20BondTokenCreated(bondToken, underlying_, expiry_);
         }
@@ -172,7 +182,9 @@ contract BondFixedExpiryTeller is BondBaseTeller, IBondFixedExpiryTeller {
     }
 
     /// @inheritdoc IBondFixedExpiryTeller
-    function getBondTokenForMarket(uint256 id_) external view override returns (ERC20BondToken) {
+    function getBondTokenForMarket(
+        uint256 id_
+    ) external view override returns (ERC20BondToken) {
         (, , ERC20 underlying, , uint48 vesting, ) = _aggregator
             .getAuctioneer(id_)
             .getMarketInfoForPurchase(id_);
