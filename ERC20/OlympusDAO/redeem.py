@@ -158,6 +158,12 @@ def is_ok(s, state):
     p = And(s.assertions()) 
     return p
 
+def is_validation(s, state, user, amount, ERC20_address, FAKEexpiryofERC20Bond):
+    balanceOfallERC20Bond, _, _ = state
+    p = And(s.assertions()) 
+    p = And(p, ULE(amount, balanceOfallERC20Bond[ERC20_address][FAKEexpiryofERC20Bond][user]))
+    return p
+
 # any external call to create
 def symbolic_create(s, state):
     ERC20_address = FreshConst(AddressSort, 'user')
@@ -187,6 +193,7 @@ def symbolic_redeem(s, state):
     _, _, balanceOfERC20 = state
 
     ERC20_address = FreshConst(AddressSort, 'user')
+    FAKEexpiryofERC20Bond = FreshConst(UintExpiry, 'expiry')
     FAKEbalanceofERC20Bond = Array('FakebalanceofERC20Bond', AddressSort, UintSort)
     FAKEtotalbalanceofERC20Bond = FreshConst(UintSort)
     user = FreshConst(AddressSort, 'user')
@@ -198,7 +205,7 @@ def symbolic_redeem(s, state):
     require(s, ForAll([a], ULE(balanceOfERC20[a], MAX_ERC20Bond)))
 
     state = redeem(s, state, ERC20_address, FAKEbalanceofERC20Bond, FAKEtotalbalanceofERC20Bond, user, amount)
-    return state 
+    return state, user, amount, ERC20_address, FAKEexpiryofERC20Bond
 
 # ok let's actually prove shit
 
@@ -234,7 +241,7 @@ def proof_redeem_withvalidation():
 
 @my_proof(s)
 def proof_redeem():
-    new_state = symbolic_redeem(s, state)
-    require(s, Not(is_ok(s, new_state)))
+    new_state, user, amount, ERC20_address, FAKEexpiryofERC20Bond = symbolic_redeem(s, state)
+    require(s, Not(is_validation(s, new_state, user, amount, ERC20_address, FAKEexpiryofERC20Bond)))
 
 run_proofs()
