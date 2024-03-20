@@ -54,9 +54,9 @@ function redeem(ERC20BondToken token_, uint256 amount_) external override nonRee
 }
 ```
 
-We prove one critical invariant: using the given ERC20BondToken's address and expiry, we must can find it in ERC20Bond (an array of ERC20Bond stored in OlympusDAO smart contract), and the amount must less or equal to the msg sender's balance.
+We prove one critical invariant: using the given `ERC20BondToken`'s address (`underly_`) and expiry (`expiry_`), we must can find it in ERC20Bond (an array of ERC20Bond stored in OlympusDAO smart contract), and the `amount_` must less or equal to the msg sender's balance.
 
-* redeem.py: totalERC20Bond[ERC20BondToken._underline][ERC20BondToken.expiry][msg_sender] >= amount
+* redeem.py: totalERC20Bond[ERC20BondToken.underly][ERC20BondToken.expiry][msg_sender] >= amount
 
 ## License
 
