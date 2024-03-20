@@ -21,7 +21,7 @@ We prove two critical invariants: (1) correctness of accounting, and (2) solvenc
 * horn.py: proof for invariant 1 (totalSupply never below total WETH issued)
 * bmc.py: proof for invariant 2 (solvency)
 
-### ERC20 - 11nrvbusd
+### 11nrvbusd
 
 Bug: 2021.6.22 Incorrect logic flow
 
@@ -40,7 +40,7 @@ We prove one critical invariants: the total balance of 11nrcbusd is always equal
 
 * emergencyBurn.py: totalBalanceOf11nrvbusd == ERC20 token in smart contract
 
-### ERC20 - OlympusDAO
+### OlympusDAO
 
 Bug: 2022.10.21 Insufficient validation
 
