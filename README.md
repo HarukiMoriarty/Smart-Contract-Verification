@@ -38,7 +38,25 @@ function emergencyBurn() public {
 
 We prove one critical invariants: the total balance of 11nrcbusd is always equal to the actual ERC20 token stored in the smart contract.
 
-* emergencyBurn.py: totalBalanceOf11nrvbusd equal to ERC20 in smart contract
+* emergencyBurn.py: totalBalanceOf11nrvbusd == ERC20 token in smart contract
+
+### ERC20 - OlympusDAO
+
+Bug: 2022.10.21 Insufficient validation
+
+```c++
+/// @inheritdoc IBondFixedExpiryTeller
+function redeem(ERC20BondToken token_, uint256 amount_) external override nonReentrant {//vulnerable point, insufficient validation
+    if (uint48(block.timestamp) < token_.expiry())
+        revert Teller_TokenNotMatured(token_.expiry());
+    token_.burn(msg.sender, amount_);
+    token_.underlying().transfer(msg.sender, amount_); //vulnerable point, custom contract return OHM.
+}
+```
+
+We prove one critical invariant: using the given ERC20BondToken's address and expiry, we must can find it in ERC20Bond (an array of ERC20Bond stored in OlympusDAO smart contract), and the amount must less or equal to the msg sender's balance.
+
+* redeem.py: totalERC20Bond[ERC20BondToken._underline][ERC20BondToken.expiry][msg_sender] >= amount
 
 ## License
 
