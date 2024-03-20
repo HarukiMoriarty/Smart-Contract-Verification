@@ -1,6 +1,6 @@
-# Formal verification of Wrapped ETH (WETH)
+# Formal verification of Smart Contract
 
-*Proving the safety of the Wrapped ETH smart contract, using the Z3 Theorem Prover*
+*Proving the safety of smart contracts, using the Z3 Theorem Prover*
 
 ## Abstract
 
