@@ -23,6 +23,23 @@ We prove two critical invariants: (1) correctness of accounting, and (2) solvenc
 
 ### ERC20 - 11nrvbusd
 
+Bug: 2021.6.22 Incorrect logic flow
+
+```c++
+function emergencyBurn() public {
+    uint balan = balanceOf(msg.sender);
+    uint avai = available();
+    if(avai<balan) IMasterMind(mastermind).withdraw(nrvPid, (balan.sub(avai)));
+    // vlunerable point: loss of 11nrvbusd _burn
+    token.safeTransfer(msg.sender, balan);
+    emit Withdrawn(msg.sender, balan, block.number);
+}
+```
+
+We prove one critical invariants: the total balance of 11nrcbusd is always equal to the actual ERC20 token stored in the smart contract.
+
+* emergencyBurn.py: totalBalanceOf11nrvbusd equal to ERC20 in smart contract
+
 ## License
 
 See LICENSE.
